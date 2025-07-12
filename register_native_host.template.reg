@@ -1,4 +1,4 @@
 Windows Registry Editor Version 5.00
 
 [HKEY_CURRENT_USER\SOFTWARE\Google\Chrome\NativeMessagingHosts\com.pubmed.endnote]
-@="C:\\Users\\Kentaro Matsui\\Dropbox\\__Coding\\PubMed-EndNote-Word Quicklinker\\com.pubmed.endnote.json"
+@="C:\\Users\\YourName\\Desktop\\pubmed2endnote-main\\com.pubmed.endnote.json"

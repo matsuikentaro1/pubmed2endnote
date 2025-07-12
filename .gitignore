@@ -7,7 +7,7 @@ test_*.js
 
 # 設定・登録ファイル（ユーザー固有）
 com.pubmed.endnote.json
-# register_native_host.reg - setup.ps1で自動生成
+register_native_host.reg
 unregister_native_host.reg
 
 # 開発用ファイル
