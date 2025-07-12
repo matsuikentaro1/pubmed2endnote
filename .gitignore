@@ -1,0 +1,42 @@
+# テスト・デバッグ用ファイル
+*.nbib
+*.log
+SendClipboard.py
+CallAPI.py
+test_*.js
+
+# 設定・登録ファイル（ユーザー固有）
+com.pubmed.endnote.json
+# register_native_host.reg - setup.ps1で自動生成
+unregister_native_host.reg
+
+# 開発用ファイル
+*.pptx
+icon作成ファイル.pptx
+
+# Pythonキャッシュ
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node.js (必要に応じて)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
