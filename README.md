@@ -10,7 +10,7 @@ PubMedの論文情報をワンクリックでEndNote形式に変換するChrome�
 - インターネット接続
 
 ### 手順
-1. **ダウンロード**: [リリースページ](https://github.com/matsuikentaro1/pubmed2endnote/releases)または「Code → Download ZIP」
+1. **ダウンロード**:「Code → Download ZIP」
 2. **install.ps1を実行**: 右クリック → 「PowerShellで実行」
 3. **指示に従う**: 拡張機能IDの入力のみ
 
