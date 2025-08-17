@@ -28,6 +28,26 @@ def safe_escape_xml(text):
         text = str(text)
     return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;").replace("'", "&#39;")
 
+def escape_rtf(text):
+    """Escapes characters for RTF."""
+    if not isinstance(text, str):
+        text = str(text)
+    return text.replace('\\', '\\\\').replace('{', '\\{').replace('}', '\\}')
+
+def format_author_name(full_name):
+    """Formats author name to Last, F. I."""
+    try:
+        parts = full_name.split(', ')
+        if len(parts) == 2:
+            last_name, first_names = parts
+            # Split by space or hyphen for multiple first/middle names
+            initials = ". ".join([name[0] for name in re.split('[ -]', first_names) if name])
+            return f"{last_name}, {initials}."
+        else:
+            return full_name # Return original if format is unexpected
+    except:
+        return full_name
+
 def get_message():
     """Reads a single message from stdin, with robust error logging."""
     try:
@@ -117,40 +137,43 @@ def process_and_copy(nbib_data):
                 i += 1
         
         if not authors:
-            logging.error("Parsing failed: No authors (AU tag) found.")
+            logging.error("Parsing failed: No authors (FAU tag) found.")
             return False
 
         # 2. Build EndNote XML
         logging.info("Building EndNote XML.")
-        logging.info(f"Parsed fields: {fields}")
-        logging.info(f"Authors found: {authors}")
         
-        # 基本フィールドの抽出
+        # 基本フィールドの抽出とフォーマット
         pmid = fields.get('PMID', '')
         year = fields.get('DP', '')[:4] if fields.get('DP') else ''
-        title = fields.get('TI', '')
-        journal = fields.get('JT', '')  # The Tohoku journal of experimental medicine
+        title = fields.get('TI', '').rstrip('.') # タイトル末尾のピリオドを削除
+        
+        # ジャーナル名の処理 (JTを優先、なければTAを使用)
+        journal_full = fields.get('JT', '').title()
+        journal_abbrev = fields.get('TA', '').title()
+        journal = journal_full if journal_full else journal_abbrev
+
         volume = fields.get('VI', '')
         pages = fields.get('PG', '')
         abstract = fields.get('AB', '')
         issue = fields.get('IP', '')
         place = fields.get('PL', '')
-        journal_abbrev = fields.get('TA', '')  # Tohoku J Exp Med
         language = fields.get('LA', '')
-        copyright_info = fields.get('CI', '')
         
-        # デバッグ: 基本フィールドをログ出力
-        logging.info(f"Raw JT field: '{fields.get('JT', 'NOT_FOUND')}'")
-        logging.info(f"Raw TA field: '{fields.get('TA', 'NOT_FOUND')}'")
-        logging.info(f"Extracted journal: '{journal}'")
-        logging.info(f"Extracted journal_abbrev: '{journal_abbrev}'")
-        
-        # 日付情報
-        edat = fields.get('EDAT', '')
-        dep_date = fields.get('DEP', '')  # 電子出版日
-        publication_status = fields.get('PST', '')
-        
-        # 複数値フィールドの処理（空値を除外）
+        # 著者名のフォーマット
+        formatted_authors = [format_author_name(name) for name in authors]
+        first_author = formatted_authors[0].split(',')[0] if formatted_authors else ''
+
+        # 日付関連の処理
+        dp_field = fields.get('DP', '') #例: 2024 Dec
+        month = ''
+        if len(dp_field.split()) > 1:
+            month = dp_field.split()[1]
+
+        edat_field = fields.get('EDAT', '') #例: 2024/09/23 03:15
+        epub_date = edat_field.split()[0] if edat_field else ''
+
+        # 複数値フィールドの処理
         def get_list_field(field_name):
             field_value = fields.get(field_name, [])
             if isinstance(field_value, list):
@@ -159,74 +182,44 @@ def process_and_copy(nbib_data):
                 return [field_value]
             else:
                 return []
-        
+
         addresses = get_list_field('AD')
         keywords = get_list_field('OT')
         mesh_terms = get_list_field('MH')
         pub_types = get_list_field('PT')
-        registry_numbers = get_list_field('RN')
         
         # ISSN処理
         issn_list = get_list_field('IS')
-        issn_electronic = [issn.split()[0] for issn in issn_list if '(Electronic)' in issn]
-        issn_linking = [issn.split()[0] for issn in issn_list if '(Linking)' in issn]
-        
+        issn_linking = ''.join([issn.split()[0] for issn in issn_list if '(Linking)' in issn])
+        issn_electronic = ''.join([issn.split()[0] for issn in issn_list if '(Electronic)' in issn])
+
         # DOI/AID処理
         lid_list = get_list_field('LID')
-        aid_list = get_list_field('AID')
+        doi = ''.join([lid.split()[0] for lid in lid_list if '[doi]' in lid])
+
+        # その他のフィールド
+        so_field = fields.get('SO', '')
+        owner = fields.get('OWN', '') # Database Provider
+
+        # 表示用テキストを生成
+        display_text = f"({first_author}, {year})" if first_author and year else f"({pmid})"
         
-        doi = ''
-        pii = ''
-        for lid in lid_list:
-            if '[doi]' in lid:
-                doi = lid.split()[0]
-            elif '[pii]' in lid:
-                pii = lid.split()[0]
-        
-        # AIDからも同様の情報を取得
-        for aid in aid_list:
-            if '[doi]' in aid and not doi:
-                doi = aid.split()[0]
-            elif '[pii]' in aid and not pii:
-                pii = aid.split()[0]
-        
-        # メールアドレス抽出（アドレスフィールドから）
-        emails = []
-        for addr in addresses:
-            email_matches = re.findall(r'Electronic address:\s*([\w\.-]+@[\w\.-]+)', addr)
-            emails.extend(email_matches)
-        
-        # 著者情報
-        first_author = authors[0].split(', ')[0] if authors else ''
-        
-        # デバッグ情報を追加
-        logging.info(f"Authors: {authors}")
-        logging.info(f"Journal: '{journal}', Journal Abbrev: '{journal_abbrev}'")
-        logging.info(f"Volume: '{volume}', Issue: '{issue}', Pages: '{pages}'")
-        logging.info(f"Addresses found: {len(addresses)} items")
-        logging.info(f"Keywords found: {len(keywords)} items")
-        logging.info(f"MeSH terms found: {len(mesh_terms)} items")
-        logging.info(f"Publication types: {pub_types}")
-        logging.info(f"Registry numbers: {len(registry_numbers)} items")
-        logging.info(f"DOI: {doi}, PII: {pii}")
-        logging.info(f"ISSN Electronic: {issn_electronic}, Linking: {issn_linking}")
-        
-        # NBIBの全フィールドをEndNote XMLに完全マッピング
+        # XML構築開始
         xml_parts = [
             "<EndNote><Cite>",
             f"<Author>{safe_escape_xml(first_author)}</Author>",
             f"<Year>{safe_escape_xml(year)}</Year>",
             f"<RecNum>{safe_escape_xml(pmid)}</RecNum>",
-            "<DisplayText>(1)</DisplayText>",
+            f"<DisplayText>{safe_escape_xml(display_text)}</DisplayText>",
             "<record>",
             f"<rec-number>{safe_escape_xml(pmid)}</rec-number>",
             "<ref-type name=\"Journal Article\">17</ref-type>",
         ]
         
-        # 著者情報（FAUとAUの両方を保持）
-        if authors:
+        # 著者情報
+        if formatted_authors:
             xml_parts.append("<contributors><authors>")
-            for author in authors:
+            for author in formatted_authors:
                 xml_parts.append(f"<author>{safe_escape_xml(author)}</author>")
             xml_parts.append("</authors></contributors>")
         
@@ -234,20 +227,19 @@ def process_and_copy(nbib_data):
         if title:
             xml_parts.append(f"<titles><title>{safe_escape_xml(title)}</title></titles>")
         
-        # 雑誌情報（JTとTA両方保持、ジャーナル名を確実に配置）
-        if journal or journal_abbrev:
+        # 雑誌情報 (JTとTA両方に対応)
+        if journal_full or journal_abbrev:
             xml_parts.append("<periodical>")
-            if journal:
-                xml_parts.append(f"<full-title>{safe_escape_xml(journal)}</full-title>")
+            if journal_full:
+                xml_parts.append(f"<full-title>{safe_escape_xml(journal_full)}</full-title>")
             if journal_abbrev:
                 xml_parts.append(f"<abbr-1>{safe_escape_xml(journal_abbrev)}</abbr-1>")
             xml_parts.append("</periodical>")
-        
+
         # 補助的なジャーナル名フィールドも追加（互換性確保）
-        if journal:
-            xml_parts.append(f"<secondary-title>{safe_escape_xml(journal)}</secondary-title>")
-        elif journal_abbrev:
-            xml_parts.append(f"<secondary-title>{safe_escape_xml(journal_abbrev)}</secondary-title>")
+        secondary_title = journal_full if journal_full else journal_abbrev
+        if secondary_title:
+            xml_parts.append(f"<secondary-title>{safe_escape_xml(secondary_title)}</secondary-title>")
         
         # 巻・号・ページ
         if volume:
@@ -258,14 +250,18 @@ def process_and_copy(nbib_data):
             xml_parts.append(f"<pages>{safe_escape_xml(pages)}</pages>")
         
         # 日付情報
+        xml_parts.append("<dates>")
         if year:
-            xml_parts.append(f"<dates><year>{safe_escape_xml(year)}</year></dates>")
-        
-        # 出版地
-        if place:
-            xml_parts.append(f"<pub-location>{safe_escape_xml(place)}</pub-location>")
-        
-        # DOI/LID
+            xml_parts.append(f"<year>{safe_escape_xml(year)}</year>")
+        if month:
+             xml_parts.append(f"<pub-dates><date>{safe_escape_xml(month)}</date></pub-dates>")
+        xml_parts.append("</dates>")
+
+        # ISSN (Linking)
+        if issn_linking:
+            xml_parts.append(f"<isbn>{safe_escape_xml(issn_linking)}</isbn>")
+
+        # DOI
         if doi:
             xml_parts.append(f"<electronic-resource-num>{safe_escape_xml(doi)}</electronic-resource-num>")
         
@@ -273,59 +269,49 @@ def process_and_copy(nbib_data):
         if abstract:
             xml_parts.append(f"<abstract>{safe_escape_xml(abstract)}</abstract>")
         
+        # キーワード (MeSH + OT)
+        all_keywords = mesh_terms + keywords
+        if all_keywords:
+            xml_parts.append("<keywords>")
+            for keyword in all_keywords:
+                xml_parts.append(f"<keyword>{safe_escape_xml(keyword)}</keyword>")
+            xml_parts.append("</keywords>")
+
+        # Notesフィールドの構築
+        notes_content = []
+        if issn_electronic:
+            notes_content.append(issn_electronic)
+        notes_content.extend(authors) # 元のフルネームの著者リスト
+        notes_content.extend(pub_types)
+        if so_field:
+            notes_content.append(so_field)
+        if place:
+            notes_content.append(place)
+        if addresses:
+            # Author AddressをNotesではなく専用フィールドに
+            full_address = ' '.join(addresses)
+            xml_parts.append(f"<author-address>{safe_escape_xml(full_address)}</author-address>")
+
+        if notes_content:
+            notes_text = '\n'.join(notes_content)
+            xml_parts.append(f"<notes>{safe_escape_xml(notes_text)}</notes>")
+
+        # Accession Number (PMID)
+        if pmid:
+            xml_parts.append(f"<accession-num>{safe_escape_xml(pmid)}</accession-num>")
+
+        # Epub Date (Custom4)
+        if epub_date:
+            xml_parts.append(f"<custom4>{safe_escape_xml(epub_date)}</custom4>")
+
+        # Database Provider (Custom3)
+        if owner:
+            xml_parts.append(f"<custom3>{safe_escape_xml(owner)}</custom3>")
+        
         # 言語
         if language:
             xml_parts.append(f"<language>{safe_escape_xml(language)}</language>")
-        
-        # 著者所属（AD）
-        if addresses:
-            for addr in addresses:
-                xml_parts.append(f"<author-address>{safe_escape_xml(addr)}</author-address>")
-        
-        # 論文タイプ（PT）- カスタムフィールドに移動してジャーナル名との混同を避ける
-        if pub_types:
-            for pt in pub_types:
-                xml_parts.append(f"<custom2>{safe_escape_xml('Publication Type: ' + pt)}</custom2>")
-        
-        # MeSH用語（MH）
-        if mesh_terms:
-            for mesh in mesh_terms:
-                xml_parts.append(f"<keyword>{safe_escape_xml(mesh)}</keyword>")
-        
-        # その他のキーワード（OT）
-        if keywords:
-            for keyword in keywords:
-                xml_parts.append(f"<keyword>{safe_escape_xml(keyword)}</keyword>")
-        
-        # 化学物質登録番号（RN）
-        if registry_numbers:
-            for rn in registry_numbers:
-                xml_parts.append(f"<research-notes>{safe_escape_xml(rn)}</research-notes>")
-        
-        # ISSN情報（IS）
-        for issn in issn_list:
-            xml_parts.append(f"<isbn>{safe_escape_xml(issn)}</isbn>")
-        
-        # NBIBの他の重要なフィールドを追加
-        # PMID
-        if pmid:
-            xml_parts.append(f"<accession-num>{safe_escape_xml(pmid)}</accession-num>")
-        
-        # 雑誌ID（JID）
-        jid = fields.get('JID', '')
-        if jid:
-            xml_parts.append(f"<call-num>{safe_escape_xml(jid)}</call-num>")
-        
-        # 状態情報（STAT, OWN, PST等）をカスタムフィールドとして保持
-        for field_name in ['STAT', 'OWN', 'DCOM', 'LR', 'SB', 'EDAT', 'MHDA', 'CRDT', 'PHST', 'AID', 'PST', 'SO']:
-            field_value = fields.get(field_name, '')
-            if field_value:
-                if isinstance(field_value, list):
-                    for value in field_value:
-                        xml_parts.append(f"<custom1>{safe_escape_xml(field_name + ': ' + value)}</custom1>")
-                else:
-                    xml_parts.append(f"<custom1>{safe_escape_xml(field_name + ': ' + field_value)}</custom1>")
-        
+
         # 終了タグ
         xml_parts.extend([
             "</record>",
@@ -334,14 +320,12 @@ def process_and_copy(nbib_data):
         xml_str = "".join(xml_parts)
         
         logging.info(f"Generated XML length: {len(xml_str)} characters")
-        logging.info(f"Generated XML (first 1000 chars): {xml_str[:1000]}...")
-        logging.info(f"Generated XML (last 500 chars): ...{xml_str[-500:]}")
 
         # 3. Generate RTF field
         logging.info("Generating RTF string.")
         rtf_full = (
             r"{\rtf1\ansi\deff0{\fonttbl{\f0 Arial;}}\pard\fs24 "
-            + r"{\field{\*\fldinst { ADDIN EN.CITE " + xml_str + r" }}{\fldrslt (1)}}"
+            + r"{\field{\*\fldinst { ADDIN EN.CITE " + xml_str + r" }}{\fldrslt " + escape_rtf(display_text) + r"}}"
             + r"}"
         )
         
@@ -354,17 +338,15 @@ def process_and_copy(nbib_data):
         win32clipboard.OpenClipboard()
         win32clipboard.EmptyClipboard()
         
-        # RTFをUTF-8でエンコードして、cp1252でデコードエラーを回避
         try:
             rtf_bytes = rtf_full.encode("cp1252", errors="replace")
         except:
-            # フォールバック: ASCII文字のみを使用
             rtf_bytes = rtf_full.encode("ascii", errors="replace")
         
         win32clipboard.SetClipboardData(rtf_format, rtf_bytes)
-        win32clipboard.SetClipboardData(win32con.CF_UNICODETEXT, "(1)".encode("utf-16le"))
+        win32clipboard.SetClipboardData(win32con.CF_UNICODETEXT, display_text.encode("utf-16le"))
         win32clipboard.CloseClipboard()
-        logging.info("Clipboard write successful. Display text: (1)")
+        logging.info(f"Clipboard write successful. Display text: {display_text}")
         return True
 
     except Exception as e:
