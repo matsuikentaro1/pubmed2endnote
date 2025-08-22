@@ -283,18 +283,19 @@ def process_and_copy(nbib_data):
             notes_content.append(issn_electronic)
         notes_content.extend(authors) # 元のフルネームの著者リスト
         notes_content.extend(pub_types)
-        if so_field:
-            notes_content.append(so_field)
         if place:
             notes_content.append(place)
+        if so_field:
+            notes_content.append(so_field)
         if addresses:
             # Author AddressをNotesではなく専用フィールドに
             full_address = ' '.join(addresses)
             xml_parts.append(f"<author-address>{safe_escape_xml(full_address)}</author-address>")
 
         if notes_content:
-            notes_text = '\n'.join(notes_content)
-            xml_parts.append(f"<notes>{safe_escape_xml(notes_text)}</notes>")
+            # EndNote Notesフィールドで改行を表示するため
+            notes_text = '&#10;'.join(notes_content)  # XML数値文字参照でLFのみ
+            xml_parts.append(f"<notes>{notes_text}</notes>")
 
         # Accession Number (PMID)
         if pmid:
