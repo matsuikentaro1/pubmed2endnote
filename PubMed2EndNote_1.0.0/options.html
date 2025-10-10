@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PubMed2EndNote Settings</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      animation: slideIn 0.4s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .logo img {
+      width: 40px;
+      height: 40px;
+    }
+
+    h1 {
+      color: #1a202c;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #718096;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      color: #2d3748;
+      font-weight: 600;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    input[type="email"] {
+      width: 100%;
+      padding: 14px 16px 14px 44px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.2s ease;
+      background: #f7fafc;
+    }
+
+    input[type="email"]:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    input[type="email"].saved {
+      border-color: #48bb78;
+      background: #f0fff4;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #a0aec0;
+    }
+
+    .help-text {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #718096;
+      line-height: 1.5;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    button {
+      flex: 1;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #save-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    #save-btn:not(:disabled):hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    #save-btn.saved {
+      background: linear-gradient(135deg, #48bb78, #38a169);
+    }
+
+    .status-message {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-size: 14px;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .status-message.success {
+      background: #f0fff4;
+      color: #276749;
+      border: 1px solid #9ae6b4;
+    }
+
+    .status-message.error {
+      background: #fff5f5;
+      color: #742a2a;
+      border: 1px solid #feb2b2;
+    }
+
+    .status-message.info {
+      background: #ebf8ff;
+      color: #2c5282;
+      border: 1px solid #90cdf4;
+    }
+
+    .info-box {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 30px;
+    }
+
+    .info-box h3 {
+      color: #2d3748;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .info-box p {
+      color: #718096;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    /* Loading animation for buttons */
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.5);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+      }
+    }
+
+    button:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    /* Smooth transitions */
+    * {
+      transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">
+        <img src="icons/icon48.png" alt="PubMed2EndNote">
+      </div>
+      <h1>PubMed2EndNote</h1>
+      <p class="subtitle">Configure your email for PubMed API access</p>
+    </div>
+
+    <div class="form-group">
+      <label for="email-input">Email Address</label>
+      <div class="input-wrapper">
+        <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+        </svg>
+        <input 
+          type="email" 
+          id="email-input" 
+          placeholder="your.email@example.com"
+          required
+        >
+      </div>
+      <p class="help-text">
+        PubMed requires an email address for API access. This email will be included in API requests for NCBI compliance.
+      </p>
+    </div>
+
+    <div class="button-group">
+      <button id="save-btn" type="button">Save Settings</button>
+    </div>
+
+    <div id="status-message" class="status-message"></div>
+
+    <div class="info-box">
+      <h3>Why is this required?</h3>
+      <p>
+        The National Center for Biotechnology Information (NCBI) requires users to provide an email address when accessing their E-utilities API. This helps them contact you if there are issues with your requests and ensures responsible use of their services.
+      </p>
+    </div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

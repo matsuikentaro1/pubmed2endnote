@@ -1,0 +1,9 @@
+{
+    "name": "com.pubmed.endnote",
+    "description": "Native messaging host for PubMed2EndNote Chrome extension",
+    "path": "C:\\Users\\YourName\\Desktop\\pubmed2endnote-main\\native_host.bat",
+    "type": "stdio",
+    "allowed_origins": [
+        "chrome-extension://PLACEHOLDER_EXTENSION_ID/"
+    ]
+}
