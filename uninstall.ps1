@@ -1,42 +1,42 @@
-# PubMed2EndNote アンインストーラー
+# PubMed2EndNote Uninstaller
 
 function Write-ColorOutput($Message, $Color = "White") {
     Write-Host $Message -ForegroundColor $Color
 }
 
 Clear-Host
-Write-ColorOutput "🗑️ PubMed2EndNote アンインストーラー" "Red"
-Write-ColorOutput "=" * 50 "Red"
+Write-ColorOutput "PubMed2EndNote Uninstaller" "Red"
+Write-ColorOutput ("=" * 50) "Red"
 
-$confirm = Read-Host "PubMed2EndNoteを完全にアンインストールしますか？ (y/n)"
+$confirm = Read-Host "Do you want to completely uninstall PubMed2EndNote? (y/n)"
 if ($confirm -ne "y" -and $confirm -ne "Y") {
-    Write-ColorOutput "アンインストールをキャンセルしました" "Yellow"
+    Write-ColorOutput "Uninstallation cancelled." "Yellow"
     return
 }
 
-# レジストリ削除
-Write-ColorOutput "レジストリエントリを削除中..." "Yellow"
+# Remove registry entry
+Write-ColorOutput "Removing registry entry..." "Yellow"
 try {
     reg delete "HKEY_CURRENT_USER\SOFTWARE\Google\Chrome\NativeMessagingHosts\com.pubmed.endnote" /f 2>$null
-    Write-ColorOutput "✅ レジストリ削除完了" "Green"
+    Write-ColorOutput "Registry entry removed." "Green"
 } catch {
-    Write-ColorOutput "⚠️ レジストリエントリが見つかりませんでした" "Yellow"
+    Write-ColorOutput "Registry entry not found." "Yellow"
 }
 
-# インストールフォルダ削除
+# Remove installation folder
 $installPath = "$env:LOCALAPPDATA\PubMed2EndNote"
 if (Test-Path $installPath) {
-    Write-ColorOutput "インストールフォルダを削除中..." "Yellow"
+    Write-ColorOutput "Removing installation folder..." "Yellow"
     try {
         Remove-Item -Path $installPath -Recurse -Force
-        Write-ColorOutput "✅ フォルダ削除完了: $installPath" "Green"
+        Write-ColorOutput "Folder removed: $installPath" "Green"
     } catch {
-        Write-ColorOutput "❌ フォルダ削除に失敗しました: $_" "Red"
+        Write-ColorOutput "Failed to remove folder: $_" "Red"
     }
 } else {
-    Write-ColorOutput "⚠️ インストールフォルダが見つかりませんでした" "Yellow"
+    Write-ColorOutput "Installation folder not found." "Yellow"
 }
 
 Write-Host ""
-Write-ColorOutput "🎉 アンインストール完了" "Green"
-Write-ColorOutput "Chrome拡張機能は手動で削除してください" "Cyan"
+Write-ColorOutput "Uninstallation completed." "Green"
+Write-ColorOutput "Please remove the Chrome extension manually." "Cyan"
