@@ -12,8 +12,8 @@ Chrome の拡張機能画面での操作、 PowerShell での実行、事前のP
 - PubMed アカウント（後続の設定でこのアドレスを使用します）
 
 ### 手順
-1. **ダウンロードと展開**: [リリースページ](https://github.com/matsuikentaro1/pubmed2endnote/releases)または「Code → Download ZIP」からアーカイブを取得し、展開して `PubMed2EndNote_1.0.0` フォルダを用意します。
-2. **Chrome に読み込む**: Chrome で `chrome://extensions/` を開き、「パッケージ化されていない拡張機能を読み込む」から `PubMed2EndNote_1.0.0` フォルダを選びます。読み込み後に表示される拡張機能 ID を必ずメモしてください（後でスクリプトに入力します）。
+1. **ダウンロードと展開**: [リリースページ](https://github.com/matsuikentaro1/pubmed2endnote/releases)または「Code → Download ZIP」からアーカイブを取得し、zipファイルを開きます。`pubmed2endnote-main`はダウンロードフォルダなど、任意の場所においてください。
+2. **Chrome に読み込む**: `pubmed2endnote-main`のフォルダ内に`PubMed2EndNote_1.0.0` フォルダが入っています。Chromeで `chrome://extensions/` を開き、「パッケージ化されていない拡張機能を読み込む」から `PubMed2EndNote_1.0.0` フォルダを選びます。読み込み後に表示される拡張機能 ID を必ずメモしてください（後でスクリプトに入力します）。
 3. **install.ps1 を実行**: `install.ps1` はダブルクリックでは起動しません。ファイルを右クリックし、「PowerShell で実行」を選んでください。スクリプト内では、手順 2 で控えた拡張機能 ID を入力します。
 4. **メールアドレスの登録**: 任意のPubMedの記事を開いてください。拡張機能の読み込みが済んでいれば、右上に丸いアイコンが表示されているはずです。初回のみメール入力画面が別ウインドウで開くので、PubMed アカウントのメールアドレスを入力してください。受理されたらページを閉じて構いません。
 5. **クリップボードにコピー**: PubMedの記事に戻り、改めて右上のアイコンをクリックしてください。"Successfully copied to clipboard!"と表記されたら成功です
