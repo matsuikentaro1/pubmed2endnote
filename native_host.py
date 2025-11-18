@@ -48,6 +48,15 @@ def format_author_name(full_name):
     except:
         return full_name
 
+def format_journal_sentence_case(journal_name):
+    """Converts journal name to sentence case (first letter capitalized, rest lowercase)."""
+    if not journal_name:
+        return ''
+    journal_name = journal_name.strip()
+    if not journal_name:
+        return ''
+    return journal_name[0].upper() + journal_name[1:].lower()
+
 def get_message():
     """Reads a single message from stdin, with robust error logging."""
     try:
@@ -148,9 +157,11 @@ def process_and_copy(nbib_data):
         year = fields.get('DP', '')[:4] if fields.get('DP') else ''
         title = fields.get('TI', '').rstrip('.') # タイトル末尾のピリオドを削除
         
-        # ジャーナル名の処理 (JTを優先、なければTAを使用)
-        journal_full = fields.get('JT', '').title()
-        journal_abbrev = fields.get('TA', '').title()
+        # ジャーナル名の処理
+        # JT: Journal Title (フルネーム) - sentence caseに変換（最初の1文字だけ大文字）
+        # TA: Title Abbreviation (略称) - そのまま使用
+        journal_full = format_journal_sentence_case(fields.get('JT', ''))
+        journal_abbrev = fields.get('TA', '').strip()
         journal = journal_full if journal_full else journal_abbrev
 
         volume = fields.get('VI', '')
@@ -227,7 +238,16 @@ def process_and_copy(nbib_data):
         if title:
             xml_parts.append(f"<titles><title>{safe_escape_xml(title)}</title></titles>")
         
-        # 雑誌情報 (JTとTA両方に対応)
+        # ジャーナル情報
+        # Journal フィールド（EndNote UI）: 略称（TA）を使用
+        if journal_abbrev:
+            xml_parts.append(f"<secondary-title>{safe_escape_xml(journal_abbrev)}</secondary-title>")
+
+        # Alternate Journal フィールド（EndNote UI）: フルネーム（JT）をsentence caseで使用
+        if journal_full:
+            xml_parts.append(f"<alt-title>{safe_escape_xml(journal_full)}</alt-title>")
+
+        # Periodicalセクション（互換性のため両方含める）
         if journal_full or journal_abbrev:
             xml_parts.append("<periodical>")
             if journal_full:
@@ -235,11 +255,6 @@ def process_and_copy(nbib_data):
             if journal_abbrev:
                 xml_parts.append(f"<abbr-1>{safe_escape_xml(journal_abbrev)}</abbr-1>")
             xml_parts.append("</periodical>")
-
-        # 補助的なジャーナル名フィールドも追加（互換性確保）
-        secondary_title = journal_full if journal_full else journal_abbrev
-        if secondary_title:
-            xml_parts.append(f"<secondary-title>{safe_escape_xml(secondary_title)}</secondary-title>")
         
         # 巻・号・ページ
         if volume:
