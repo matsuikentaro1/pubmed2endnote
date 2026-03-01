@@ -6,7 +6,7 @@ function Write-ColorOutput($Message, $Color = "White") {
 
 Clear-Host
 Write-ColorOutput "🗑️ PubMed2EndNote アンインストーラー" "Red"
-Write-ColorOutput "=" * 50 "Red"
+Write-ColorOutput ("=" * 50) "Red"
 
 $confirm = Read-Host "PubMed2EndNoteを完全にアンインストールしますか？ (y/n)"
 if ($confirm -ne "y" -and $confirm -ne "Y") {
@@ -40,3 +40,5 @@ if (Test-Path $installPath) {
 Write-Host ""
 Write-ColorOutput "🎉 アンインストール完了" "Green"
 Write-ColorOutput "Chrome拡張機能は手動で削除してください" "Cyan"
+Write-Host ""
+Read-Host "Enterキーを押して終了"

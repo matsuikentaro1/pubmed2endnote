@@ -35,7 +35,7 @@ Write-ColorOutput "ファイルをコピー中..." "Yellow"
 $filesToCopy = @(
     "native_host.py",
     "native_host.bat",
-    "PubMed2EndNote_1.0.0"
+    "PubMed2EndNote_2.0.0"
 )
 foreach ($file in $filesToCopy) {
     Copy-Item -Path $file -Destination $InstallPath -Recurse -Force
@@ -49,7 +49,7 @@ Write-Host ""
 Write-ColorOutput "Chrome拡張機能のIDを入力してください:" "Cyan"
 Write-Host " 1. chrome://extensions/ を開く"
 Write-Host " 2. デベロッパーモードをON"
-Write-Host " 3. PubMed2EndNote_1.0.0 フォルダを読み込む"
+Write-Host " 3. PubMed2EndNote_2.0.0 フォルダを読み込む"
 Write-Host " 4. 表示されたIDをコピー"
 Write-Host ""
 

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PubMed2EndNote",
-  "version": "1.0",
+  "version": "2.0",
   "description": "Copy PubMed citations to clipboard in EndNote-compatible RTF format for Microsoft Word",
   "permissions": [
     "storage",

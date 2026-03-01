@@ -19,19 +19,19 @@ class PubMedEndNoteService {
 
     async handleSinglePMID(pmid, userEmail, sendResponse) {
         try {
-            // 1. Fetch the raw NBIB data from PubMed
-            const nbibData = await this.fetchNBIBData(pmid, userEmail);
-            
-            // 2. Send the raw NBIB data to the native host for processing
+            // 1. Fetch PubMed XML data
+            const xmlData = await this.fetchXMLData(pmid, userEmail);
+
+            // 2. Send the XML data to the native host for processing
             const hostName = "com.pubmed.endnote";
-            chrome.runtime.sendNativeMessage(hostName, { nbib_data: nbibData }, (response) => {
+            chrome.runtime.sendNativeMessage(hostName, { xml_data: xmlData }, (response) => {
                 // 3. Handle the response from the native host
                 if (chrome.runtime.lastError) {
                     console.error("Native Messaging Error:", chrome.runtime.lastError.message);
                     sendResponse({ success: false, error: "Native host communication error: " + chrome.runtime.lastError.message });
                     return;
                 }
-                
+
                 console.log("Received from native host:", response);
                 if (response && response.status === 'success') {
                     sendResponse({ success: true, message: "Citation copied to clipboard." });
@@ -42,23 +42,23 @@ class PubMedEndNoteService {
                 }
             });
         } catch (error) {
-            // This will catch errors from fetchNBIBData
+            // This will catch errors from fetchXMLData
             console.error('Error processing PMID:', error);
             sendResponse({ success: false, error: error.message });
         }
     }
 
-    async fetchNBIBData(pmid, userEmail) {
-        const url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=${pmid}&rettype=medline&retmode=text&email=${encodeURIComponent(userEmail)}`;
+    async fetchXMLData(pmid, userEmail) {
+        const url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=${pmid}&rettype=xml&retmode=xml&email=${encodeURIComponent(userEmail)}`;
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`PubMed API error: ${response.status}`);
         }
-        const nbibData = await response.text();
-        if (!nbibData || nbibData.trim() === '') {
+        const xmlData = await response.text();
+        if (!xmlData || xmlData.trim() === '') {
             throw new Error(`No data found for PMID: ${pmid}`);
         }
-        return nbibData;
+        return xmlData;
     }
 
 }
