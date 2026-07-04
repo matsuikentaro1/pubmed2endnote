@@ -142,6 +142,24 @@
       flex: 1;
     }
 
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #2d3748;
+      font-size: 14px;
+      margin-bottom: 0;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #667eea;
+      cursor: pointer;
+    }
+
     .input-icon {
       position: absolute;
       left: 16px;
@@ -315,8 +333,19 @@
     <p class="help-text">
       Match the font of the manuscript you are writing. The pasted citation will use this font
       when Word's paste option is "Keep Source Formatting".
-      / 執筆中の論文のフォントに合わせられます（Wordの貼り付け設定が「元の書式を保持」の場合に適用されます）。
     </p>
+
+    <div class="form-group" style="margin-top: 16px;">
+      <label class="checkbox-label">
+        <input type="checkbox" id="highlight-checkbox" checked>
+        Highlight the pasted citation in yellow
+      </label>
+      <p class="help-text">
+        Makes freshly pasted citations easy to spot. Note: the highlight appears only when
+        Word's default paste option is set to "Keep Source Formatting"
+        (File &gt; Options &gt; Advanced &gt; Cut, copy, and paste &gt; Pasting from other programs).
+      </p>
+    </div>
 
     <div class="section-title">PubMed API</div>
 
@@ -335,8 +364,7 @@
         >
       </div>
       <p class="help-text">
-        Sent only to NCBI (PubMed) as a contact parameter, as their API guidelines recommend.
-        <strong>It is never collected by the developer of this extension.</strong>
+        Used only to access the PubMed API properly. <strong>The developer never collects it.</strong>
       </p>
     </div>
 

@@ -5,6 +5,7 @@ class OptionsController {
         this.emailInput = document.getElementById('email-input');
         this.fontSelect = document.getElementById('font-select');
         this.sizeSelect = document.getElementById('size-select');
+        this.highlightCheckbox = document.getElementById('highlight-checkbox');
         this.saveBtn = document.getElementById('save-btn');
         this.statusMessage = document.getElementById('status-message');
 
@@ -28,7 +29,7 @@ class OptionsController {
         });
 
         // Any change resets the "Saved" state so the user notices unsaved edits
-        for (const el of [this.emailInput, this.fontSelect, this.sizeSelect]) {
+        for (const el of [this.emailInput, this.fontSelect, this.sizeSelect, this.highlightCheckbox]) {
             el.addEventListener('input', () => this.markDirty());
             el.addEventListener('change', () => this.markDirty());
         }
@@ -43,7 +44,7 @@ class OptionsController {
 
     async loadSavedSettings() {
         try {
-            const result = await chrome.storage.sync.get(['userEmail', 'fontFamily', 'fontSize']);
+            const result = await chrome.storage.sync.get(['userEmail', 'fontFamily', 'fontSize', 'highlightEnabled']);
             if (result.userEmail) {
                 this.emailInput.value = result.userEmail;
                 this.emailInput.classList.add('saved');
@@ -52,6 +53,7 @@ class OptionsController {
             }
             this.fontSelect.value = result.fontFamily || 'Times New Roman';
             this.sizeSelect.value = result.fontSize || '10.5';
+            this.highlightCheckbox.checked = result.highlightEnabled !== false;
         } catch (error) {
             console.error('Error loading settings:', error);
             this.showStatus('Error loading settings', 'error');
@@ -78,7 +80,8 @@ class OptionsController {
             await chrome.storage.sync.set({
                 userEmail: email,
                 fontFamily: this.fontSelect.value,
-                fontSize: this.sizeSelect.value
+                fontSize: this.sizeSelect.value,
+                highlightEnabled: this.highlightCheckbox.checked
             });
 
             this.showStatus('Settings saved! You can now use the extension on PubMed pages.', 'success');

@@ -357,13 +357,15 @@ function buildEndNoteXml(fields, authors) {
 
 // Word reconstructs an { ADDIN EN.CITE ... } field from mso-element markers
 // inside <!--[if supportFields]--> conditional comments on paste.
-// fontFamily / fontSize (optional) let the pasted citation match the manuscript;
+// fontFamily / fontSize / highlight (optional) control the citation's formatting;
 // they apply when Word's paste option is "Keep Source Formatting".
-function buildWordFieldHtml(xmlStr, displayText, { fontFamily = '', fontSize = '' } = {}) {
+function buildWordFieldHtml(xmlStr, displayText, { fontFamily = '', fontSize = '', highlight = true } = {}) {
     const fieldInstr = escapeHtml(` ADDIN EN.CITE ${xmlStr} `);
-    let spanStyle = 'background:yellow;mso-highlight:yellow';
-    if (fontFamily) spanStyle += `;font-family:"${fontFamily}"`;
-    if (fontSize) spanStyle += `;font-size:${fontSize}pt`;
+    const styleParts = [];
+    if (highlight) styleParts.push('background:yellow', 'mso-highlight:yellow');
+    if (fontFamily) styleParts.push(`font-family:"${fontFamily}"`);
+    if (fontSize) styleParts.push(`font-size:${fontSize}pt`);
+    const spanStyle = styleParts.join(';');
     // Bare inline fragment, no <html>/<body> wrapper: Word pastes it into the middle of a
     // sentence without splitting the paragraph or appending a paragraph break.
     return (
