@@ -51,7 +51,7 @@ class OptionsController {
                 this.saveBtn.classList.add('saved');
             }
             this.fontSelect.value = result.fontFamily || 'Times New Roman';
-            this.sizeSelect.value = result.fontSize || '';
+            this.sizeSelect.value = result.fontSize || '10.5';
         } catch (error) {
             console.error('Error loading settings:', error);
             this.showStatus('Error loading settings', 'error');

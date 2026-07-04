@@ -25,25 +25,31 @@
     icon.addEventListener("mouseleave", () => { Object.assign(icon.style, { transform: "scale(1)", boxShadow: "0 2px 6px rgba(0,0,0,0.2)" }); });
     shadowRoot.appendChild(icon);
 
-    // Right-click on the icon shows a small "Settings" menu
+    // Right-click on the icon shows a small menu
     const menu = document.createElement("div");
     Object.assign(menu.style, {
         display: "none", position: "absolute", top: "52px", right: "0",
         background: "white", borderRadius: "8px", boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
-        padding: "4px", minWidth: "140px", fontFamily: "sans-serif", fontSize: "14px"
+        padding: "4px", minWidth: "160px", fontFamily: "sans-serif", fontSize: "14px"
     });
-    const menuItem = document.createElement("div");
-    menuItem.textContent = "⚙ Settings";
-    Object.assign(menuItem.style, {
-        padding: "8px 12px", borderRadius: "6px", cursor: "pointer", color: "#1a202c", whiteSpace: "nowrap"
-    });
-    menuItem.addEventListener("mouseenter", () => { menuItem.style.background = "#eef2ff"; });
-    menuItem.addEventListener("mouseleave", () => { menuItem.style.background = "transparent"; });
-    menuItem.addEventListener("click", () => {
-        menu.style.display = "none";
-        chrome.runtime.sendMessage({ action: 'openSettings' });
-    });
-    menu.appendChild(menuItem);
+    const menuEntries = [
+        { label: "Export to Clipboard", onClick: () => exportCitation() },
+        { label: "Settings", onClick: () => chrome.runtime.sendMessage({ action: 'openSettings' }) },
+    ];
+    for (const entry of menuEntries) {
+        const item = document.createElement("div");
+        item.textContent = entry.label;
+        Object.assign(item.style, {
+            padding: "8px 12px", borderRadius: "6px", cursor: "pointer", color: "#1a202c", whiteSpace: "nowrap"
+        });
+        item.addEventListener("mouseenter", () => { item.style.background = "#eef2ff"; });
+        item.addEventListener("mouseleave", () => { item.style.background = "transparent"; });
+        item.addEventListener("click", () => {
+            menu.style.display = "none";
+            entry.onClick();
+        });
+        menu.appendChild(item);
+    }
     shadowRoot.appendChild(menu);
 
     icon.addEventListener("contextmenu", (e) => {
@@ -52,7 +58,7 @@
         document.addEventListener("click", () => { menu.style.display = "none"; }, { once: true });
     });
 
-    icon.addEventListener("click", async () => {
+    const exportCitation = async () => {
         const originalTitle = icon.title;
         icon.style.cursor = "wait";
 
@@ -69,7 +75,7 @@
             const xmlData = await fetchPubMedXml(pmid, result.userEmail);
 
             // Conversion + clipboard write happen right here in the page (citation.js)
-            await convertAndCopy(xmlData, { fontFamily: result.fontFamily || 'Times New Roman', fontSize: result.fontSize || '' });
+            await convertAndCopy(xmlData, { fontFamily: result.fontFamily || 'Times New Roman', fontSize: result.fontSize || '10.5' });
 
             icon.title = "✓ Successfully copied to clipboard!";
             icon.style.background = "linear-gradient(135deg, #059669, #10b981)";
@@ -86,7 +92,9 @@
                 icon.style.background = "linear-gradient(135deg, #1e3a8a, #3b82f6)";
             }, 3000);
         }
-    });
+    };
+
+    icon.addEventListener("click", exportCitation);
 
 
     function showNotification(message, type) {
