@@ -35,9 +35,9 @@ PubMedの論文情報をワンクリックでEndNote引用としてWordに貼り
 
 ### ⚙️ 設定画面
 
-拡張機能の設定画面（`chrome://extensions/` → PubMed2EndNote → 「拡張機能のオプション」）で以下を変更できます：
+PubMedページ右上の青いアイコンを**右クリック → Settings** で設定画面が開きます（`chrome://extensions/` → PubMed2EndNote → 「拡張機能のオプション」からも開けます）：
 
-- **フォント / フォントサイズ**: 貼り付ける引用のフォントを執筆中の論文に合わせられます（Century, Times New Roman, Calibri, Arial など）。「Default」のままならWord側の書式になります
+- **フォント / フォントサイズ**: 貼り付ける引用のフォントを執筆中の論文に合わせられます（デフォルトは Times New Roman。Century, Calibri, Arial なども選択可）
 - **メールアドレス**: PubMed API（NCBI E-utilities）の利用マナーとしてNCBIにのみ送信されるもので、開発者が収集することはありません
 
 ※ メールアドレスはPubMed API（NCBI E-utilities）の利用マナーとして送信されるもので、それ以外には使用されません。

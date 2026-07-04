@@ -25,6 +25,33 @@
     icon.addEventListener("mouseleave", () => { Object.assign(icon.style, { transform: "scale(1)", boxShadow: "0 2px 6px rgba(0,0,0,0.2)" }); });
     shadowRoot.appendChild(icon);
 
+    // Right-click on the icon shows a small "Settings" menu
+    const menu = document.createElement("div");
+    Object.assign(menu.style, {
+        display: "none", position: "absolute", top: "52px", right: "0",
+        background: "white", borderRadius: "8px", boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
+        padding: "4px", minWidth: "140px", fontFamily: "sans-serif", fontSize: "14px"
+    });
+    const menuItem = document.createElement("div");
+    menuItem.textContent = "⚙ Settings";
+    Object.assign(menuItem.style, {
+        padding: "8px 12px", borderRadius: "6px", cursor: "pointer", color: "#1a202c", whiteSpace: "nowrap"
+    });
+    menuItem.addEventListener("mouseenter", () => { menuItem.style.background = "#eef2ff"; });
+    menuItem.addEventListener("mouseleave", () => { menuItem.style.background = "transparent"; });
+    menuItem.addEventListener("click", () => {
+        menu.style.display = "none";
+        chrome.runtime.sendMessage({ action: 'openSettings' });
+    });
+    menu.appendChild(menuItem);
+    shadowRoot.appendChild(menu);
+
+    icon.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        menu.style.display = "block";
+        document.addEventListener("click", () => { menu.style.display = "none"; }, { once: true });
+    });
+
     icon.addEventListener("click", async () => {
         const originalTitle = icon.title;
         icon.style.cursor = "wait";
@@ -42,7 +69,7 @@
             const xmlData = await fetchPubMedXml(pmid, result.userEmail);
 
             // Conversion + clipboard write happen right here in the page (citation.js)
-            await convertAndCopy(xmlData, { fontFamily: result.fontFamily || '', fontSize: result.fontSize || '' });
+            await convertAndCopy(xmlData, { fontFamily: result.fontFamily || 'Times New Roman', fontSize: result.fontSize || '' });
 
             icon.title = "✓ Successfully copied to clipboard!";
             icon.style.background = "linear-gradient(135deg, #059669, #10b981)";

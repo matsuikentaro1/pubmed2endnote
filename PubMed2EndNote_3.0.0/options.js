@@ -50,7 +50,7 @@ class OptionsController {
                 this.saveBtn.textContent = 'Saved ✓';
                 this.saveBtn.classList.add('saved');
             }
-            this.fontSelect.value = result.fontFamily || '';
+            this.fontSelect.value = result.fontFamily || 'Times New Roman';
             this.sizeSelect.value = result.fontSize || '';
         } catch (error) {
             console.error('Error loading settings:', error);
