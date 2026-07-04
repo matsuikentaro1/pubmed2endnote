@@ -39,15 +39,17 @@
             }
 
             icon.title = "Processing...";
-            const response = await chrome.runtime.sendMessage({ action: 'fetchAndFormatPMID', pmid: pmid, userEmail: result.userEmail });
-
-            if (response.success) {
-                icon.title = "✓ Successfully copied to clipboard!";
-                icon.style.background = "linear-gradient(135deg, #059669, #10b981)";
-                showNotification("Successfully copied to clipboard!", "success");
-            } else {
-                throw new Error(response.error || 'Processing failed');
+            const response = await chrome.runtime.sendMessage({ action: 'fetchPubMedXML', pmid: pmid, userEmail: result.userEmail });
+            if (!response.success) {
+                throw new Error(response.error || 'Failed to fetch PubMed data');
             }
+
+            // Conversion + clipboard write happen right here in the page (citation.js)
+            await convertAndCopy(response.xmlData);
+
+            icon.title = "✓ Successfully copied to clipboard!";
+            icon.style.background = "linear-gradient(135deg, #059669, #10b981)";
+            showNotification("Successfully copied to clipboard!", "success");
         } catch (error) {
             console.error('Error:', error);
             icon.title = `❌ Error: ${error.message}`;

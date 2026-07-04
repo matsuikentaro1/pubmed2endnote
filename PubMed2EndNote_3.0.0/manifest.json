@@ -1,13 +1,11 @@
 {
   "manifest_version": 3,
   "name": "PubMed2EndNote",
-  "version": "2.0",
-  "description": "Copy PubMed citations to clipboard in EndNote-compatible RTF format for Microsoft Word",
+  "version": "3.0",
+  "description": "Copy PubMed citations to clipboard as EndNote-compatible Word citations with one click",
   "permissions": [
     "storage",
-    "clipboardWrite",
-    "tabs",
-    "nativeMessaging"
+    "clipboardWrite"
   ],
   "host_permissions": [
     "https://eutils.ncbi.nlm.nih.gov/*"
@@ -15,7 +13,7 @@
   "content_scripts": [
     {
       "matches": ["https://pubmed.ncbi.nlm.nih.gov/*"],
-      "js": ["content.js"]
+      "js": ["citation.js", "content.js"]
     }
   ],
   "background": {
