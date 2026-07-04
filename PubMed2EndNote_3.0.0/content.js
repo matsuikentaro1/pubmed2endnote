@@ -64,9 +64,15 @@
 
         try {
             const result = await chrome.storage.sync.get(['userEmail', 'fontFamily', 'fontSize', 'highlightEnabled']);
+            if (!result.userEmail || result.userEmail.trim() === '') {
+                icon.title = "Opening email setup...";
+                icon.style.background = "linear-gradient(135deg, #f59e0b, #fbbf24)";
+                chrome.runtime.sendMessage({ action: 'openSettings' });
+                return;
+            }
 
             icon.title = "Processing...";
-            const xmlData = await fetchPubMedXml(pmid, (result.userEmail || '').trim());
+            const xmlData = await fetchPubMedXml(pmid, result.userEmail.trim());
 
             // Conversion + clipboard write happen right here in the page (citation.js)
             await convertAndCopy(xmlData, {

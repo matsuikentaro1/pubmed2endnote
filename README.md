@@ -29,7 +29,7 @@ PubMedの論文情報をワンクリックでEndNote引用としてWordに貼り
 ## 📱 使い方
 
 1. **PubMedで論文検索**: https://pubmed.ncbi.nlm.nih.gov/
-2. **青いアイコンをクリック**: 論文ページ右上に表示
+2. **青いアイコンをクリック**: 論文ページ右上に表示（初回はメールアドレス設定画面が開きます）
 3. **Wordに貼り付け**: Ctrl+V でEndNote引用として貼り付け（黄色ハイライト付き）
 4. EndNoteタブの「Update Citations and Bibliography」で引用と文献リストが整形されます
 
@@ -38,7 +38,7 @@ PubMedの論文情報をワンクリックでEndNote引用としてWordに貼り
 PubMedページ右上の青いアイコンを**右クリック → Settings** で設定画面が開きます（`chrome://extensions/` → PubMed2EndNote → 「拡張機能のオプション」からも開けます）：
 
 - **フォント / フォントサイズ**: 貼り付ける引用のフォントを執筆中の論文に合わせられます（デフォルトは Times New Roman。Century, Calibri, Arial なども選択可）
-- **メールアドレス（任意・推奨）**: PubMed API（NCBI E-utilities）の利用ポリシーで推奨される連絡先として、NCBIにのみ送信されます。開発者が収集することはありません。未入力でも動作します
+- **メールアドレス**: PubMed API（NCBI E-utilities）の利用ポリシーに準拠するための連絡先として、NCBIにのみ送信されます。開発者が収集することはありません
 
 ※ メールアドレスはPubMed API（NCBI E-utilities）の利用マナーとして送信されるもので、それ以外には使用されません。
 
