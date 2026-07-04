@@ -364,11 +364,9 @@ function buildWordFieldHtml(xmlStr, displayText, { fontFamily = '', fontSize = '
     let spanStyle = 'background:yellow;mso-highlight:yellow';
     if (fontFamily) spanStyle += `;font-family:"${fontFamily}"`;
     if (fontSize) spanStyle += `;font-size:${fontSize}pt`;
-    // No <p> wrapper: an inline fragment pastes into the middle of a sentence without
-    // splitting the paragraph or bringing its own paragraph spacing along.
-    return '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
-        'xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
-        '<head><meta charset="utf-8"></head><body>' +
+    // Bare inline fragment, no <html>/<body> wrapper: Word pastes it into the middle of a
+    // sentence without splitting the paragraph or appending a paragraph break.
+    return (
         // The highlight span wraps the ENTIRE field (like \highlight7 around \field in RTF),
         // so the yellow survives when EndNote's instant formatting regenerates the field result.
         `<span style='${spanStyle}'>` +
@@ -377,22 +375,15 @@ function buildWordFieldHtml(xmlStr, displayText, { fontFamily = '', fontSize = '
         "<span style='mso-element:field-separator'></span><![endif]-->" +
         escapeHtml(displayText) +
         "<!--[if supportFields]><span style='mso-element:field-end'></span><![endif]-->" +
-        '</span></body></html>';
+        '</span>');
 }
 
 // --- Clipboard ---
 
+// The copy-event path is preferred: it writes the HTML string to the clipboard verbatim.
+// navigator.clipboard.write() re-serializes the HTML through a DOM and wraps it in a full
+// <html><body> document, which makes Word append a paragraph break after the citation.
 async function copyCitationToClipboard(html, plainText) {
-    try {
-        await navigator.clipboard.write([new ClipboardItem({
-            'text/html': new Blob([html], { type: 'text/html' }),
-            'text/plain': new Blob([plainText], { type: 'text/plain' }),
-        })]);
-        return;
-    } catch (err) {
-        console.warn('navigator.clipboard.write failed, falling back to copy event:', err);
-    }
-
     const handler = (ev) => {
         ev.clipboardData.setData('text/html', html);
         ev.clipboardData.setData('text/plain', plainText);
@@ -401,7 +392,13 @@ async function copyCitationToClipboard(html, plainText) {
     document.addEventListener('copy', handler, { once: true });
     const ok = document.execCommand('copy');
     document.removeEventListener('copy', handler);
-    if (!ok) throw new Error('Clipboard write failed');
+    if (ok) return;
+
+    console.warn('execCommand copy failed, falling back to navigator.clipboard.write');
+    await navigator.clipboard.write([new ClipboardItem({
+        'text/html': new Blob([html], { type: 'text/html' }),
+        'text/plain': new Blob([plainText], { type: 'text/plain' }),
+    })]);
 }
 
 // --- PubMed API fetch ---
