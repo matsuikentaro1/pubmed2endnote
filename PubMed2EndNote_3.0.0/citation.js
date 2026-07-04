@@ -364,10 +364,11 @@ function buildWordFieldHtml(xmlStr, displayText, { fontFamily = '', fontSize = '
     let spanStyle = 'background:yellow;mso-highlight:yellow';
     if (fontFamily) spanStyle += `;font-family:"${fontFamily}"`;
     if (fontSize) spanStyle += `;font-size:${fontSize}pt`;
+    // No <p> wrapper: an inline fragment pastes into the middle of a sentence without
+    // splitting the paragraph or bringing its own paragraph spacing along.
     return '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
         'xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
         '<head><meta charset="utf-8"></head><body>' +
-        '<p class=MsoNormal>' +
         // The highlight span wraps the ENTIRE field (like \highlight7 around \field in RTF),
         // so the yellow survives when EndNote's instant formatting regenerates the field result.
         `<span style='${spanStyle}'>` +
@@ -376,7 +377,7 @@ function buildWordFieldHtml(xmlStr, displayText, { fontFamily = '', fontSize = '
         "<span style='mso-element:field-separator'></span><![endif]-->" +
         escapeHtml(displayText) +
         "<!--[if supportFields]><span style='mso-element:field-end'></span><![endif]-->" +
-        '</span></p></body></html>';
+        '</span></body></html>';
 }
 
 // --- Clipboard ---
