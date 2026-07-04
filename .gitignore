@@ -5,6 +5,9 @@ trash/
 *.pptx
 *.log
 
+# リリース成果物（Chrome Web Storeアップロード用ZIP）
+*.zip
+
 # OS
 Thumbs.db
 Desktop.ini
