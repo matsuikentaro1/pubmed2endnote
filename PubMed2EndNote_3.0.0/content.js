@@ -39,13 +39,10 @@
             }
 
             icon.title = "Processing...";
-            const response = await chrome.runtime.sendMessage({ action: 'fetchPubMedXML', pmid: pmid, userEmail: result.userEmail });
-            if (!response.success) {
-                throw new Error(response.error || 'Failed to fetch PubMed data');
-            }
+            const xmlData = await fetchPubMedXml(pmid, result.userEmail);
 
             // Conversion + clipboard write happen right here in the page (citation.js)
-            await convertAndCopy(response.xmlData);
+            await convertAndCopy(xmlData);
 
             icon.title = "✓ Successfully copied to clipboard!";
             icon.style.background = "linear-gradient(135deg, #059669, #10b981)";

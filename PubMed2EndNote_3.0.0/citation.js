@@ -395,6 +395,23 @@ async function copyCitationToClipboard(html, plainText) {
     if (!ok) throw new Error('Clipboard write failed');
 }
 
+// --- PubMed API fetch ---
+// E-utilities sends Access-Control-Allow-Origin: *, so the content script can
+// fetch directly and no host permission is needed.
+
+async function fetchPubMedXml(pmid, userEmail) {
+    const url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=${pmid}&rettype=xml&retmode=xml&email=${encodeURIComponent(userEmail)}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`PubMed API error: ${response.status}`);
+    }
+    const xmlData = await response.text();
+    if (!xmlData || xmlData.trim() === '') {
+        throw new Error(`No data found for PMID: ${pmid}`);
+    }
+    return xmlData;
+}
+
 // --- Entry point used by content.js ---
 
 async function convertAndCopy(xmlData) {

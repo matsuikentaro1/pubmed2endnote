@@ -7,9 +7,6 @@
     "storage",
     "clipboardWrite"
   ],
-  "host_permissions": [
-    "https://eutils.ncbi.nlm.nih.gov/*"
-  ],
   "content_scripts": [
     {
       "matches": ["https://pubmed.ncbi.nlm.nih.gov/*"],
