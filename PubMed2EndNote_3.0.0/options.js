@@ -63,12 +63,8 @@ class OptionsController {
     async saveSettings() {
         const email = this.emailInput.value.trim();
 
-        if (!email) {
-            this.showStatus('Please enter an email address', 'error');
-            return;
-        }
-
-        if (!this.isValidEmail(email)) {
+        // Email is optional; validate only when provided
+        if (email && !this.isValidEmail(email)) {
             this.showStatus('Please enter a valid email address', 'error');
             return;
         }

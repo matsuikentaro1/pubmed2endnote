@@ -408,7 +408,9 @@ async function copyCitationToClipboard(html, plainText) {
 // fetch directly and no host permission is needed.
 
 async function fetchPubMedXml(pmid, userEmail) {
-    const url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=${pmid}&rettype=xml&retmode=xml&email=${encodeURIComponent(userEmail)}`;
+    // tool identifies this app to NCBI; email is optional and appended only if provided
+    let url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=${pmid}&rettype=xml&retmode=xml&tool=PubMed2EndNote`;
+    if (userEmail) url += `&email=${encodeURIComponent(userEmail)}`;
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error(`PubMed API error: ${response.status}`);

@@ -83,7 +83,7 @@ PubMed2EndNote converts PubMed article metadata into an EndNote-compatible citat
 
 <h3>権限の使用理由（Permission justifications）</h3>
 <table>
-  <tr><th>storage</th><td><div class="copy">Stores the user's preferences entered on the options page: an email address and citation font settings. The email address is appended to NCBI E-utilities API requests as a contact parameter, as recommended by NCBI's API usage guidelines. The font settings control the formatting of the pasted citation. Neither is used for any other purpose.</div></td></tr>
+  <tr><th>storage</th><td><div class="copy">Stores the user's preferences entered on the options page: an optional email address and citation formatting settings (font, size, highlight). The email address, if provided, is appended to NCBI E-utilities API requests as a contact parameter, as recommended by NCBI's API usage guidelines. Nothing is used for any other purpose.</div></td></tr>
   <tr><th>clipboardWrite</th><td><div class="copy">Writes the formatted EndNote citation to the clipboard when the user clicks the copy button on a PubMed article page. This is the core function of the extension.</div></td></tr>
   <tr><th>ホスト権限<br>（content script:<br>pubmed.ncbi.nlm.nih.gov）</th><td><div class="copy">Injects a copy button on PubMed article pages (pubmed.ncbi.nlm.nih.gov). This is the sole surface of the extension; it does not read or modify page content beyond adding this button.</div></td></tr>
 </table>
@@ -97,7 +97,7 @@ PubMed2EndNote converts PubMed article metadata into an EndNote-compatible citat
   <tr><th>収集するデータ</th><td>☑ <strong>個人を特定できる情報</strong>（Personally identifiable information）— メールアドレス<br>それ以外の項目（位置情報、ウェブ履歴、健康情報など）はすべて<strong>チェックなし</strong></td></tr>
   <tr><th>3つの誓約</th><td>すべてチェック可能：<br>☑ 承認された用途以外でユーザーデータを販売しない<br>☑ アイテムの単一用途に関係のない目的でデータを使用・転送しない<br>☑ 信用度の判断や融資目的でデータを使用・転送しない</td></tr>
 </table>
-<div class="note">メールアドレスは「ユーザーが設定画面で自ら入力し、NCBI APIへのリクエストに付加される」だけで、開発者側のサーバーには一切送信・保存されません。この点をプライバシーポリシーに明記しておけば審査はスムーズです。</div>
+<div class="note">メールアドレスは**任意入力**で、「ユーザーが設定画面で自ら入力した場合のみNCBI APIへのリクエストに付加される」だけです。開発者側のサーバーには一切送信・保存されません。この点をプライバシーポリシーに明記しておけば審査はスムーズです。</div>
 
 <h3>プライバシーポリシーURL</h3>
 <p>個人情報（メールアドレス）を扱う申告をするため、<strong>公開URLのプライバシーポリシーが必須</strong>です。リポジトリに <code>PRIVACY.md</code> を置いてGitHubのファイルURLを貼るのが最も簡単です。以下ドラフト：</p>
@@ -106,11 +106,12 @@ PubMed2EndNote converts PubMed article metadata into an EndNote-compatible citat
 Last updated: July 4, 2026
 
 ## Data collected
-PubMed2EndNote asks the user to enter an email address on its options page.
-This email address is:
+PubMed2EndNote lets the user optionally enter an email address on its options page.
+If provided, this email address is:
 - stored locally in the browser (chrome.storage.sync), and
 - appended as a contact parameter to requests sent to the NCBI E-utilities API
   (https://eutils.ncbi.nlm.nih.gov/), as recommended by NCBI's API usage guidelines.
+The extension is fully functional without providing an email address.
 
 The email address is NOT sent to the developer or to any third party other than
 NCBI, and is not used for tracking, advertising, or any other purpose.
