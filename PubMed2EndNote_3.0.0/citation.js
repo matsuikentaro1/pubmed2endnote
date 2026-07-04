@@ -363,12 +363,15 @@ function buildWordFieldHtml(xmlStr, displayText) {
         'xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
         '<head><meta charset="utf-8"></head><body>' +
         '<p class=MsoNormal>' +
+        // The highlight span wraps the ENTIRE field (like \highlight7 around \field in RTF),
+        // so the yellow survives when EndNote's instant formatting regenerates the field result.
+        "<span style='background:yellow;mso-highlight:yellow'>" +
         "<!--[if supportFields]><span style='mso-element:field-begin'></span>" +
         fieldInstr +
         "<span style='mso-element:field-separator'></span><![endif]-->" +
-        "<span style='background:yellow;mso-highlight:yellow'>" + escapeHtml(displayText) + '</span>' +
+        escapeHtml(displayText) +
         "<!--[if supportFields]><span style='mso-element:field-end'></span><![endif]-->" +
-        '</p></body></html>';
+        '</span></p></body></html>';
 }
 
 // --- Clipboard ---
