@@ -357,15 +357,20 @@ function buildEndNoteXml(fields, authors) {
 
 // Word reconstructs an { ADDIN EN.CITE ... } field from mso-element markers
 // inside <!--[if supportFields]--> conditional comments on paste.
-function buildWordFieldHtml(xmlStr, displayText) {
+// fontFamily / fontSize (optional) let the pasted citation match the manuscript;
+// they apply when Word's paste option is "Keep Source Formatting".
+function buildWordFieldHtml(xmlStr, displayText, { fontFamily = '', fontSize = '' } = {}) {
     const fieldInstr = escapeHtml(` ADDIN EN.CITE ${xmlStr} `);
+    let spanStyle = 'background:yellow;mso-highlight:yellow';
+    if (fontFamily) spanStyle += `;font-family:"${fontFamily}"`;
+    if (fontSize) spanStyle += `;font-size:${fontSize}pt`;
     return '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
         'xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
         '<head><meta charset="utf-8"></head><body>' +
         '<p class=MsoNormal>' +
         // The highlight span wraps the ENTIRE field (like \highlight7 around \field in RTF),
         // so the yellow survives when EndNote's instant formatting regenerates the field result.
-        "<span style='background:yellow;mso-highlight:yellow'>" +
+        `<span style='${spanStyle}'>` +
         "<!--[if supportFields]><span style='mso-element:field-begin'></span>" +
         fieldInstr +
         "<span style='mso-element:field-separator'></span><![endif]-->" +
@@ -417,13 +422,13 @@ async function fetchPubMedXml(pmid, userEmail) {
 
 // --- Entry point used by content.js ---
 
-async function convertAndCopy(xmlData) {
+async function convertAndCopy(xmlData, formatOptions = {}) {
     const { fields, authors } = parsePubMedXml(xmlData);
     if (!authors.length) {
         throw new Error('No authors found in PubMed record');
     }
     const { xmlStr, displayText } = buildEndNoteXml(fields, authors);
-    const html = buildWordFieldHtml(xmlStr, displayText);
+    const html = buildWordFieldHtml(xmlStr, displayText, formatOptions);
     await copyCitationToClipboard(html, displayText);
     return displayText;
 }

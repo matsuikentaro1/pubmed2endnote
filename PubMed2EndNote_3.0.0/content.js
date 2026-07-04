@@ -30,7 +30,7 @@
         icon.style.cursor = "wait";
 
         try {
-            const result = await chrome.storage.sync.get(['userEmail']);
+            const result = await chrome.storage.sync.get(['userEmail', 'fontFamily', 'fontSize']);
             if (!result.userEmail || result.userEmail.trim() === '') {
                 icon.title = "Opening email setup...";
                 icon.style.background = "linear-gradient(135deg, #f59e0b, #fbbf24)";
@@ -42,7 +42,7 @@
             const xmlData = await fetchPubMedXml(pmid, result.userEmail);
 
             // Conversion + clipboard write happen right here in the page (citation.js)
-            await convertAndCopy(xmlData);
+            await convertAndCopy(xmlData, { fontFamily: result.fontFamily || '', fontSize: result.fontSize || '' });
 
             icon.title = "✓ Successfully copied to clipboard!";
             icon.style.background = "linear-gradient(135deg, #059669, #10b981)";

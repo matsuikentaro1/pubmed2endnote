@@ -33,6 +33,13 @@ PubMedの論文情報をワンクリックでEndNote引用としてWordに貼り
 3. **Wordに貼り付け**: Ctrl+V でEndNote引用として貼り付け（黄色ハイライト付き）
 4. EndNoteタブの「Update Citations and Bibliography」で引用と文献リストが整形されます
 
+### ⚙️ 設定画面
+
+拡張機能の設定画面（`chrome://extensions/` → PubMed2EndNote → 「拡張機能のオプション」）で以下を変更できます：
+
+- **フォント / フォントサイズ**: 貼り付ける引用のフォントを執筆中の論文に合わせられます（Century, Times New Roman, Calibri, Arial など）。「Default」のままならWord側の書式になります
+- **メールアドレス**: PubMed API（NCBI E-utilities）の利用マナーとしてNCBIにのみ送信されるもので、開発者が収集することはありません
+
 ※ メールアドレスはPubMed API（NCBI E-utilities）の利用マナーとして送信されるもので、それ以外には使用されません。
 
 ## 🛠️ 仕組み

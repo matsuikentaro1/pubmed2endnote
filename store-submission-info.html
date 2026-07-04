@@ -83,7 +83,7 @@ PubMed2EndNote converts PubMed article metadata into an EndNote-compatible citat
 
 <h3>権限の使用理由（Permission justifications）</h3>
 <table>
-  <tr><th>storage</th><td><div class="copy">Stores the user's email address (entered on the options page). The email address is appended to NCBI E-utilities API requests as a contact parameter, as recommended by NCBI's API usage guidelines. It is not used for any other purpose.</div></td></tr>
+  <tr><th>storage</th><td><div class="copy">Stores the user's preferences entered on the options page: an email address and citation font settings. The email address is appended to NCBI E-utilities API requests as a contact parameter, as recommended by NCBI's API usage guidelines. The font settings control the formatting of the pasted citation. Neither is used for any other purpose.</div></td></tr>
   <tr><th>clipboardWrite</th><td><div class="copy">Writes the formatted EndNote citation to the clipboard when the user clicks the copy button on a PubMed article page. This is the core function of the extension.</div></td></tr>
   <tr><th>ホスト権限<br>（content script:<br>pubmed.ncbi.nlm.nih.gov）</th><td><div class="copy">Injects a copy button on PubMed article pages (pubmed.ncbi.nlm.nih.gov). This is the sole surface of the extension; it does not read or modify page content beyond adding this button.</div></td></tr>
 </table>

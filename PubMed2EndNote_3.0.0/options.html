@@ -78,7 +78,7 @@
     }
 
     .form-group {
-      margin-bottom: 30px;
+      margin-bottom: 24px;
     }
 
     label {
@@ -115,6 +115,33 @@
       background: #f0fff4;
     }
 
+    select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 16px;
+      background: #f7fafc;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .select-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .select-row .form-group {
+      flex: 1;
+    }
+
     .input-icon {
       position: absolute;
       left: 16px;
@@ -128,6 +155,17 @@
       font-size: 13px;
       color: #718096;
       line-height: 1.5;
+    }
+
+    .section-title {
+      color: #4a5568;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 6px;
+      margin: 30px 0 16px;
     }
 
     .button-group {
@@ -227,24 +265,10 @@
       line-height: 1.6;
     }
 
-    /* Loading animation for buttons */
-    @keyframes pulse {
-      0% {
-        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.5);
-      }
-      70% {
-        box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
-      }
-      100% {
-        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
-      }
-    }
-
     button:active:not(:disabled) {
       transform: scale(0.98);
     }
 
-    /* Smooth transitions */
     * {
       transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
     }
@@ -257,8 +281,46 @@
         <img src="icons/icon48.png" alt="PubMed2EndNote">
       </div>
       <h1>PubMed2EndNote</h1>
-      <p class="subtitle">Configure your email for PubMed API access</p>
+      <p class="subtitle">Settings</p>
     </div>
+
+    <div class="section-title">Citation Formatting</div>
+
+    <div class="select-row">
+      <div class="form-group">
+        <label for="font-select">Font</label>
+        <select id="font-select">
+          <option value="">Default (Word settings)</option>
+          <option value="Century">Century</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Calibri">Calibri</option>
+          <option value="Arial">Arial</option>
+          <option value="Cambria">Cambria</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Palatino Linotype">Palatino Linotype</option>
+          <option value="Garamond">Garamond</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="size-select">Font Size</label>
+        <select id="size-select">
+          <option value="">Default</option>
+          <option value="9">9 pt</option>
+          <option value="10">10 pt</option>
+          <option value="10.5">10.5 pt</option>
+          <option value="11">11 pt</option>
+          <option value="12">12 pt</option>
+          <option value="14">14 pt</option>
+        </select>
+      </div>
+    </div>
+    <p class="help-text">
+      Match the font of the manuscript you are writing. The pasted citation will use this font
+      when Word's paste option is "Keep Source Formatting".
+      / 執筆中の論文のフォントに合わせられます（Wordの貼り付け設定が「元の書式を保持」の場合に適用されます）。
+    </p>
+
+    <div class="section-title">PubMed API</div>
 
     <div class="form-group">
       <label for="email-input">Email Address</label>
@@ -267,15 +329,17 @@
           <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
           <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
         </svg>
-        <input 
-          type="email" 
-          id="email-input" 
+        <input
+          type="email"
+          id="email-input"
           placeholder="your.email@example.com"
           required
         >
       </div>
       <p class="help-text">
-        PubMed requires an email address for API access. This email will be included in API requests for NCBI compliance.
+        Sent only to NCBI (PubMed) as a contact parameter, as their API guidelines recommend.
+        <strong>It is never collected by the developer of this extension.</strong>
+        / このメールアドレスはNCBI（PubMed）のAPI利用マナーとしてNCBIにのみ送信されます。<strong>この拡張機能の開発者が収集することはありません。</strong>
       </p>
     </div>
 
@@ -286,9 +350,9 @@
     <div id="status-message" class="status-message"></div>
 
     <div class="info-box">
-      <h3>Why is this required?</h3>
+      <h3>Why is an email address required?</h3>
       <p>
-        The National Center for Biotechnology Information (NCBI) requires users to provide an email address when accessing their E-utilities API. This helps them contact you if there are issues with your requests and ensures responsible use of their services.
+        The National Center for Biotechnology Information (NCBI) asks users to provide an email address when accessing their E-utilities API, so they can contact you if there are issues with your requests. It is used for nothing else.
       </p>
     </div>
   </div>
