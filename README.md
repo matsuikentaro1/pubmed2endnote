@@ -1,70 +1,83 @@
-# 🚀 PubMed2EndNote
+# PubMed2EndNote
 
-PubMedの論文情報をワンクリックでEndNote引用としてWordに貼り付けられるChrome拡張機能
+Chrome extension that copies a PubMed article to the clipboard as an **EndNote-compatible Word citation field** in one click.
 
-## ✨ 特徴
+**Install from Chrome Web Store:**  
+https://chromewebstore.google.com/detail/pubmed2endnote/fjcjpmjhmlkigknkfcchbbbacgchgofi
 
-- PubMedの論文ページにコピー用ボタンを追加
-- ワンクリックでEndNote対応の引用がクリップボードにコピーされる
-- Wordに貼り付けるだけで、EndNoteが認識できる引用フィールドになる（黄色ハイライト付き）
-- 著者名・雑誌名・巻号ページ・DOI・Abstract・MeSHタームなどの書誌情報を自動取得
-- ウムラウト等の特殊文字にも対応
+## What it does
 
-## ⚡ インストール
+- Adds a button on PubMed article pages
+- Copies an EndNote Cite While You Write (CWYW) citation field to the clipboard
+- Paste into Microsoft Word (`Ctrl+V` / `Cmd+V`); EndNote can treat it as a real citation
+- Pulls metadata via the official NCBI E-utilities API (authors, journal, volume/issue/pages, DOI, abstract, MeSH, etc.)
+- Supports special characters (e.g. umlauts)
+- Optional yellow highlight on paste so you can spot new citations quickly
 
-### 必要なもの
-- Google Chrome
-- インターネット接続
-- Microsoft Word + EndNote（Cite While You Write）
+## Requirements
 
-### 手順
-1. **ダウンロード**: 「Code → Download ZIP」で解凍
-2. **Chrome拡張機能を読み込む**:
-   - `chrome://extensions/` を開く
-   - 「デベロッパーモード」をON
-   - 「パッケージ化されていない拡張機能を読み込む」で `PubMed2EndNote_3.0.0` フォルダを選択
+- Google Chrome (or another Chromium browser that can load this extension)
+- Microsoft Word + EndNote (Cite While You Write)
+- Internet access (for NCBI API)
 
-**完了！**
+## Install
 
-## 📱 使い方
+### Option A — Chrome Web Store (recommended)
 
-1. **PubMedで論文検索**: https://pubmed.ncbi.nlm.nih.gov/
-2. **青いアイコンをクリック**: 論文ページ右上に表示（初回はメールアドレス設定画面が開きます）
-3. **Wordに貼り付け**: Ctrl+V でEndNote引用として貼り付け（黄色ハイライト付き）
-4. EndNoteタブの「Update Citations and Bibliography」で引用と文献リストが整形されます
+1. Open the [Chrome Web Store listing](https://chromewebstore.google.com/detail/pubmed2endnote/fjcjpmjhmlkigknkfcchbbbacgchgofi)
+2. Click **Add to Chrome**
 
-### ⚙️ 設定画面
+### Option B — Load from this repository
 
-PubMedページ右上の青いアイコンを**右クリック → Settings** で設定画面が開きます（`chrome://extensions/` → PubMed2EndNote → 「拡張機能のオプション」からも開けます）：
+1. Clone or download this repo
+2. Open `chrome://extensions/`
+3. Enable **Developer mode**
+4. **Load unpacked** → select the `PubMed2EndNote_3.0.0` folder
 
-- **フォント / フォントサイズ**: 貼り付ける引用のフォントを執筆中の論文に合わせられます（デフォルトは Times New Roman。Century, Calibri, Arial なども選択可）
-- **メールアドレス**: PubMed API（NCBI E-utilities）の利用ポリシーに準拠するための連絡先として、NCBIにのみ送信されます。開発者が収集することはありません
+## Usage
 
-※ メールアドレスはPubMed API（NCBI E-utilities）の利用マナーとして送信されるもので、それ以外には使用されません。
+1. Open an article on [PubMed](https://pubmed.ncbi.nlm.nih.gov/)
+2. Click the blue button (top-right of the page)
+3. On first use, set an email address in the options page (see below)
+4. Paste into Word
+5. In the EndNote tab, run **Update Citations and Bibliography**
 
-## 🛠️ 仕組み
+### Options
 
-1. PubMed E-utilities APIから論文の書誌情報（XML）を取得
-2. EndNoteのTraveling Library形式（`ADDIN EN.CITE` フィールドコード）を生成
-3. Word互換のHTML形式でクリップボードに書き込み
-4. Wordが貼り付け時にフィールドを再構築し、EndNoteが引用として認識
+Right-click the blue button → **Settings**, or open extension options from `chrome://extensions/`.
 
-すべてブラウザ内で完結し、外部ソフトのインストールは不要です。
+- **Font / size** for the pasted citation (default: Times New Roman)
+- **Email** for NCBI E-utilities contact policy (stored only in your browser; sent only with NCBI API requests; not collected by the developer)
 
-## 🔄 アンインストール
+See [PRIVACY.md](PRIVACY.md) for details.
 
-`chrome://extensions/` で拡張機能を削除するだけです。
+## How it works
 
-## 🆘 トラブルシューティング
+1. Fetch article XML from NCBI E-utilities
+2. Build an EndNote Traveling Library field (`ADDIN EN.CITE`)
+3. Write Word-compatible HTML to the clipboard
+4. Word rebuilds the field on paste; EndNote recognizes the citation
 
-- **青いアイコンが表示されない**: ページを再読み込みし、拡張機能が有効になっているか確認
-- **クリックすると設定画面が開く**: メールアドレスを設定して保存してから再度クリック
-- **EndNoteが認識しない**: Wordで「EndNote」タブ → 「Update Citations and Bibliography」を実行
-- **貼り付けてもただの文字になる**: Wordの貼り付けオプションで「元の書式を保持」を選択
-- **黄色ハイライトが付かない**: Wordの「ファイル → オプション → 詳細設定 → 切り取り、コピー、貼り付け」で「**他のプログラムからの貼り付け**」を「**元の書式を保持（既定）**」にしてください。「書式を結合」になっているとハイライトだけが除去されます（引用機能自体は動作します）
+Everything runs in the browser. No native host or extra desktop installer.
 
-### サポート
-問題が解決しない場合は [Issues](https://github.com/matsuikentaro1/pubmed2endnote/issues) で報告してください
+## Troubleshooting
 
----
-🤖 このプロジェクトは[Claude Code](https://claude.ai/code)で開発されました
+| Problem | What to try |
+|--------|-------------|
+| No blue button | Reload the page; confirm the extension is enabled |
+| Click opens settings | Save an email in options, then try again |
+| EndNote does not pick it up | EndNote tab → **Update Citations and Bibliography** |
+| Paste is plain text only | Use paste option **Keep Source Formatting** |
+| No yellow highlight | Word → File → Options → Advanced → Cut, copy, and paste → set **Pasting from other programs** to **Keep Source Formatting** (Merge Formatting can strip highlight only) |
+
+## Uninstall
+
+Remove the extension from `chrome://extensions/`.
+
+## Issues
+
+Bug reports and ideas: [GitHub Issues](https://github.com/matsuikentaro1/pubmed2endnote/issues)
+
+## License / notice
+
+Free to use. Bibliographic data comes from NCBI. This project is not affiliated with NCBI, NLM, Clarivate, or EndNote.

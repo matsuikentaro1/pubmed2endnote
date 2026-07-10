@@ -1,12 +1,22 @@
-# ローカル作業用（削除ファイルの退避先）
+# Local cleanup / junk
 trash/
 
-# 開発用ファイル
+# Dev assets
 *.pptx
 *.log
+__pycache__/
+*.pyc
 
-# リリース成果物（Chrome Web Storeアップロード用ZIP）
+# Reddit draft / automation (local only — do not publish)
+scripts/
+reddit-post*.txt
+reddit_debug*.png
+.env
+.env.*
+
+# Chrome Web Store packaging
 *.zip
+store-submission-info.html
 
 # OS
 Thumbs.db
